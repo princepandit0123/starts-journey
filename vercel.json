@@ -1,81 +1,25 @@
 {
   "version": 2,
   "rewrites": [
-    {
-      "source": "/article/:slug",
-      "destination": "/article.html"
-    },
-    {
-      "source": "/admin",
-      "destination": "/admin.html"
-    },
-    {
-      "source": "/bollywood",
-      "destination": "/bollywood.html"
-    },
-    {
-      "source": "/movies",
-      "destination": "/movies.html"
-    },
-    {
-      "source": "/ott",
-      "destination": "/ott.html"
-    },
-    {
-      "source": "/web-series",
-      "destination": "/web-series.html"
-    },
-    {
-      "source": "/celebrities",
-      "destination": "/celebrities.html"
-    },
-    {
-      "source": "/creators",
-      "destination": "/creators.html"
-    },
-    {
-      "source": "/hollywood",
-      "destination": "/hollywood.html"
-    },
-    {
-      "source": "/reviews",
-      "destination": "/reviews.html"
-    },
-    {
-      "source": "/box-office",
-      "destination": "/box-office.html"
-    },
-    {
-      "source": "/cricket",
-      "destination": "/cricket.html"
-    },
-    {
-      "source": "/about",
-      "destination": "/about.html"
-    },
-    {
-      "source": "/contact",
-      "destination": "/contact.html"
-    },
-    {
-      "source": "/editorial-policy",
-      "destination": "/editorial-policy.html"
-    },
-    {
-      "source": "/privacy",
-      "destination": "/privacy.html"
-    },
-    {
-      "source": "/terms",
-      "destination": "/terms.html"
-    },
-    {
-      "source": "/disclaimer",
-      "destination": "/disclaimer.html"
-    },
-    {
-      "source": "/corrections",
-      "destination": "/corrections.html"
-    }
+    {"source": "/", "destination": "/api/home"},
+    {"source": "/article/:slug", "destination": "/article.html"},
+    {"source": "/admin", "destination": "/admin.html"},
+    {"source": "/bollywood", "destination": "/bollywood.html"},
+    {"source": "/movies", "destination": "/movies.html"},
+    {"source": "/ott", "destination": "/ott.html"},
+    {"source": "/web-series", "destination": "/web-series.html"},
+    {"source": "/celebrities", "destination": "/celebrities.html"},
+    {"source": "/creators", "destination": "/creators.html"},
+    {"source": "/hollywood", "destination": "/hollywood.html"},
+    {"source": "/reviews", "destination": "/reviews.html"},
+    {"source": "/box-office", "destination": "/box-office.html"},
+    {"source": "/cricket", "destination": "/cricket.html"},
+    {"source": "/about", "destination": "/about.html"},
+    {"source": "/contact", "destination": "/contact.html"},
+    {"source": "/editorial-policy", "destination": "/editorial-policy.html"},
+    {"source": "/privacy", "destination": "/privacy.html"},
+    {"source": "/terms", "destination": "/terms.html"},
+    {"source": "/disclaimer", "destination": "/disclaimer.html"},
+    {"source": "/corrections", "destination": "/corrections.html"}
   ]
 }
