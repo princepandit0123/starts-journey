@@ -12,9 +12,9 @@ const ASHISH = {
   source: 'STARTS JOURNEY',
   author: 'STARTS JOURNEY Editorial',
   readTime: '5 min read',
-  image: 'https://raw.githubusercontent.com/princepandit0123/starts-journey/main/uploads/ashish-yadav-photo-1.jpeg?v=4',
+  image: 'https://raw.githubusercontent.com/princepandit0123/starts-journey/main/uploads/ashish-yadav-photo-1.jpeg?v=5',
   tags: ['Ashish Yadav','Jhansi','Content Creator','Fashion','Lifestyle','Travel','Instagram Creator'],
-  gallery: [1,2,3].map(n => ({image:`https://raw.githubusercontent.com/princepandit0123/starts-journey/main/uploads/ashish-yadav-photo-${n}.jpeg?v=4`})).concat([4,5,6,7,8,9].map(n => ({image:`https://raw.githubusercontent.com/princepandit0123/starts-journey/main/uploads/ashish-yadav-photo-${n}.jpg?v=4`})))
+  gallery: [1,2,3].map(n => ({image:`https://raw.githubusercontent.com/princepandit0123/starts-journey/main/uploads/ashish-yadav-photo-${n}.jpeg?v=5`})).concat([4,5,6,7,8,9].map(n => ({image:`https://raw.githubusercontent.com/princepandit0123/starts-journey/main/uploads/ashish-yadav-photo-${n}.jpg?v=5`})))
 };
 
 function loadFallback() {
@@ -38,7 +38,7 @@ function fixAshishImages(a) {
     if (!m) return src;
     const n = Number(m[1]);
     const ext = n <= 3 ? 'jpeg' : 'jpg';
-    return `https://raw.githubusercontent.com/princepandit0123/starts-journey/main/uploads/ashish-yadav-photo-${n}.${ext}?v=4`;
+    return `https://raw.githubusercontent.com/princepandit0123/starts-journey/main/uploads/ashish-yadav-photo-${n}.${ext}?v=5`;
   };
   return { ...a, image: fix(a.image), subjectImage: fix(a.subjectImage), gallery: Array.isArray(a.gallery) ? a.gallery.map(g => ({ ...g, image: fix(g.image) })) : a.gallery };
 }
@@ -119,19 +119,19 @@ async function loadLiveNews() {
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store, max-age=0');
   const p = (req.url || '').split('?')[0];
-  if (p === '/api/health') return res.status(200).json({ ok: true, vercel: true });
+  if (p === '/api/health') return res.status(200).json({ ok: true, vercel: true, build: 'search-fix-v5' });
   if (p === '/api/content') {
     const fallback = loadFallback().map(fixAshishImages);
     const live = await loadLiveNews();
-    const combined = [...live, ...fallback];
-    if (!combined.some(a => a.id === ASHISH.id || a.subjectName === 'Ashish Yadav')) combined.push(ASHISH);
+    // Keep the Ashish profile first and always searchable, independent of live-news/fallback loading.
+    const combined = [ASHISH, ...live, ...fallback.filter(a => a.id !== ASHISH.id && a.subjectName !== 'Ashish Yadav')];
     const seen = new Set();
     const articles = combined.filter(a => {
       const k = a.sourceUrl || a.id || a.title;
       if (seen.has(k)) return false;
       seen.add(k); return true;
     }).slice(0, 200);
-    return res.status(200).json({ ticker: 'BREAKING · LIVE NEWS · CRICKET · BOLLYWOOD · CELEBRITIES', articles, lastSync: live.length ? live[0].updatedAt : null, build: 'search-fix-v4' });
+    return res.status(200).json({ ticker: 'BREAKING · LIVE NEWS · CRICKET · BOLLYWOOD · CELEBRITIES', articles, lastSync: live.length ? live[0].updatedAt : null, build: 'search-fix-v5' });
   }
   if (p === '/api/sync-news') return res.status(200).json({ ok: true, count: (await loadLiveNews()).length, message: 'Live news refreshes automatically every 10 minutes.' });
   return res.status(404).json({ error: 'API route not found' });
