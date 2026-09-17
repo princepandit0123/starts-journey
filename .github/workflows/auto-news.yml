@@ -1,26 +1,66 @@
-name: Automatic News Update
+name: Fix Site + 10 Minute News
 on:
+  push:
+    branches: [main]
   schedule:
-    - cron: '0 0 * * *'
+    - cron: '*/10 * * * *'
   workflow_dispatch:
 permissions:
   contents: write
 jobs:
-  update-news:
+  update:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - name: Update news
-        env:
-          NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
-        run: node scripts/update-news.js
-      - name: Commit updated news
+      - name: Fix live news and Ashish photo loading
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('index.html'); s=p.read_text()
+          marker='<!-- STARTS JOURNEY LIVE FEED FIX -->'
+          if marker not in s:
+              snippet='''\n<script>\n(()=>{\n async function loadLive(){\n  try{const r=await fetch('/data/news.json?ts='+Date.now(),{cache:'no-store'});if(!r.ok)return;const live=await r.json();if(!Array.isArray(live)||!live.length)return;const seen=new Set((allArticles||[]).map(a=>a.sourceUrl||a.title||a.id));allArticles=[...live,...(allArticles||[])].filter(a=>{const k=a.sourceUrl||a.title||a.id;if(seen.has(k)&&!live.includes(a))return false;seen.add(k);return true;});if(typeof applySearch==='function')applySearch(new URLSearchParams(location.search).get('q')||'');const st=document.getElementById('liveStatus');if(st)st.querySelector('span').textContent='🔴 LIVE NEWS AUTO-UPDATE · Last sync: '+new Date().toLocaleString('en-IN');}catch(e){}}\n loadLive();setInterval(loadLive,600000);\n})();\n</script>\n'''
+              p.write_text(s.replace('</body>',marker+snippet+'</body>'))
+          p=Path('article.html'); s=p.read_text()
+          marker='<!-- STARTS JOURNEY ASHISH PHOTO FIX -->'
+          if marker not in s:
+              snippet='''\n<script>\n(()=>{const base='https://raw.githubusercontent.com/princepandit0123/starts-journey/main/uploads/';function fix(){document.querySelectorAll('img[src*="ashish-yadav-photo"]').forEach(img=>{const m=img.src.match(/ashish-yadav-photo-(\\d+)\\.(?:jpe?g)/i);if(m)img.src=base+'ashish-yadav-photo-'+m[1]+'.jpg?v=1';});}fix();new MutationObserver(fix).observe(document.documentElement,{subtree:true,childList:true});setInterval(fix,3000);})();\n</script>\n'''
+              p.write_text(s.replace('</body>',marker+snippet+'</body>'))
+          PY
+      - name: Refresh news now
+        run: |
+          python3 - <<'PY'
+          import urllib.request, urllib.parse, re, html, json, pathlib, datetime
+          feeds=[
+            'https://news.google.com/rss/search?'+urllib.parse.urlencode({'q':'Bollywood OR Hindi cinema OR OTT OR celebrity when:2h','hl':'en-IN','gl':'IN','ceid':'IN:en'}),
+            'https://news.google.com/rss/search?'+urllib.parse.urlencode({'q':'Indian entertainment OR film OR web series when:2h','hl':'en-IN','gl':'IN','ceid':'IN:en'})]
+          items=[]
+          for u in feeds:
+            try:
+              x=urllib.request.urlopen(urllib.request.Request(u,headers={'User-Agent':'STARTS-JOURNEY/1.0'}),timeout=20).read().decode('utf-8','ignore')
+              for block in re.findall(r'<item>(.*?)</item>',x,re.S|re.I):
+                def g(tag):
+                  m=re.search(r'<'+tag+r'(?:\s[^>]*)?>(.*?)</'+tag+r'>',block,re.S|re.I);return html.unescape(re.sub(r'<[^>]+>','',m.group(1))).strip() if m else ''
+                t=g('title');link=g('link');desc=g('description');pub=g('pubDate');src=g('source') or 'Google News'
+                if t and link:items.append({'title':t,'description':desc,'sourceUrl':link,'publishedAt':pub,'source':src})
+            except Exception as e:print('feed error',e)
+          now=datetime.datetime.now(datetime.timezone.utc).isoformat();fresh=[];seen=set()
+          for i,a in enumerate(items):
+            if a['sourceUrl'] in seen:continue
+            seen.add(a['sourceUrl']);a.update({'id':'live-news-'+str(i)+'-'+str(int(datetime.datetime.now().timestamp())),'category':'ENTERTAINMENT · LIVE NEWS','updatedAt':now,'author':'STARTS JOURNEY Live Desk','readTime':'3 min read','live':True});fresh.append(a)
+          p=pathlib.Path('data/news.json');old=[]
+          try:old=json.loads(p.read_text())
+          except:pass
+          merged=[];keys=set()
+          for a in fresh+old:
+            k=a.get('sourceUrl') or a.get('title')
+            if k and k not in keys:keys.add(k);merged.append(a)
+          p.parent.mkdir(exist_ok=True);p.write_text(json.dumps(merged[:100],ensure_ascii=False,indent=2)+'\n');print('news:',len(fresh),'stored:',len(merged[:100]))
+          PY
+      - name: Commit fixes
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/news.json
-          git diff --cached --quiet || git commit -m 'chore: automatic news update'
+          git add index.html article.html data/news.json
+          git diff --cached --quiet || git commit -m 'fix: 10 minute live news and Ashish photos'
           git push
