@@ -3,11 +3,32 @@ const path = require('path');
 
 let liveCache = { at: 0, articles: [] };
 
+const ASHISH = {
+  id: 'ashish-yadav-jhansi-luxury-digital-life',
+  title: 'From Jhansi to a Luxury-Led Digital Life: The Story of Ashish Yadav',
+  description: 'How a student from Jhansi turned an Oppo A15s into his first creative tool, built an audience of 400K+, and carved out a distinct identity through fashion, lifestyle and travel.',
+  category: 'LIFESTYLE · CREATOR',
+  subjectName: 'Ashish Yadav',
+  source: 'STARTS JOURNEY',
+  author: 'STARTS JOURNEY Editorial',
+  readTime: '5 min read',
+  image: 'https://raw.githubusercontent.com/princepandit0123/starts-journey/main/uploads/ashish-yadav-photo-1.jpeg?v=4',
+  tags: ['Ashish Yadav','Jhansi','Content Creator','Fashion','Lifestyle','Travel','Instagram Creator'],
+  gallery: [1,2,3].map(n => ({image:`https://raw.githubusercontent.com/princepandit0123/starts-journey/main/uploads/ashish-yadav-photo-${n}.jpeg?v=4`})).concat([4,5,6,7,8,9].map(n => ({image:`https://raw.githubusercontent.com/princepandit0123/starts-journey/main/uploads/ashish-yadav-photo-${n}.jpg?v=4`})))
+};
+
 function loadFallback() {
-  const html = fs.readFileSync(path.join(process.cwd(), 'index.html'), 'utf8');
-  const m = html.match(/const fallbackArticles=(\[[\s\S]*?\]);\s*let allArticles=/);
-  if (!m) return [];
-  try { return JSON.parse(m[1]); } catch { return []; }
+  try {
+    const html = fs.readFileSync(path.join(process.cwd(), 'index.html'), 'utf8');
+    const m = html.match(/const\s+fallbackArticles\s*=\s*(\[[\s\S]*?\]);\s*let\s+allArticles\s*=/);
+    if (m) {
+      try {
+        const parsed = JSON.parse(m[1]);
+        if (Array.isArray(parsed)) return parsed;
+      } catch {}
+    }
+  } catch {}
+  return [];
 }
 
 function fixAshishImages(a) {
@@ -17,7 +38,7 @@ function fixAshishImages(a) {
     if (!m) return src;
     const n = Number(m[1]);
     const ext = n <= 3 ? 'jpeg' : 'jpg';
-    return `https://raw.githubusercontent.com/princepandit0123/starts-journey/main/uploads/ashish-yadav-photo-${n}.${ext}?v=3`;
+    return `https://raw.githubusercontent.com/princepandit0123/starts-journey/main/uploads/ashish-yadav-photo-${n}.${ext}?v=4`;
   };
   return { ...a, image: fix(a.image), subjectImage: fix(a.subjectImage), gallery: Array.isArray(a.gallery) ? a.gallery.map(g => ({ ...g, image: fix(g.image) })) : a.gallery };
 }
@@ -102,17 +123,15 @@ module.exports = async (req, res) => {
   if (p === '/api/content') {
     const fallback = loadFallback().map(fixAshishImages);
     const live = await loadLiveNews();
+    const combined = [...live, ...fallback];
+    if (!combined.some(a => a.id === ASHISH.id || a.subjectName === 'Ashish Yadav')) combined.push(ASHISH);
     const seen = new Set();
-    const combined = [...live, ...fallback].filter(a => {
-      const k = a.sourceUrl || a.title || a.id;
+    const articles = combined.filter(a => {
+      const k = a.sourceUrl || a.id || a.title;
       if (seen.has(k)) return false;
       seen.add(k); return true;
-    });
-    // Keep Ashish Yadav in the API payload on every request, so homepage search works even when live news exists.
-    const ashish = combined.find(a => a.subjectName === 'Ashish Yadav' || a.id === 'ashish-yadav-jhansi-luxury-digital-life');
-    const others = combined.filter(a => a !== ashish);
-    const articles = ashish ? [ashish, ...others].slice(0, 200) : combined.slice(0, 200);
-    return res.status(200).json({ ticker: 'BREAKING · LIVE NEWS · CRICKET · BOLLYWOOD · CELEBRITIES', articles, lastSync: live.length ? live[0].updatedAt : null, build: 'search-fix-v3' });
+    }).slice(0, 200);
+    return res.status(200).json({ ticker: 'BREAKING · LIVE NEWS · CRICKET · BOLLYWOOD · CELEBRITIES', articles, lastSync: live.length ? live[0].updatedAt : null, build: 'search-fix-v4' });
   }
   if (p === '/api/sync-news') return res.status(200).json({ ok: true, count: (await loadLiveNews()).length, message: 'Live news refreshes automatically every 10 minutes.' });
   return res.status(404).json({ error: 'API route not found' });
