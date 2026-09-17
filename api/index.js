@@ -103,11 +103,15 @@ module.exports = async (req, res) => {
     const fallback = loadFallback().map(fixAshishImages);
     const live = await loadLiveNews();
     const seen = new Set();
-    const articles = [...live, ...fallback].filter(a => {
+    const combined = [...live, ...fallback].filter(a => {
       const k = a.sourceUrl || a.title || a.id;
       if (seen.has(k)) return false;
       seen.add(k); return true;
-    }).slice(0, 200);
+    });
+    // Always keep the Ashish Yadav profile in the API payload so the homepage search can find it.
+    const ashish = combined.find(a => a.subjectName === 'Ashish Yadav' || a.id === 'ashish-yadav-jhansi-luxury-digital-life');
+    const others = combined.filter(a => a !== ashish);
+    const articles = ashish ? [ashish, ...others].slice(0, 200) : combined.slice(0, 200);
     return res.status(200).json({ ticker: 'BREAKING · LIVE NEWS · CRICKET · BOLLYWOOD · CELEBRITIES', articles, lastSync: live.length ? live[0].updatedAt : null });
   }
   if (p === '/api/sync-news') return res.status(200).json({ ok: true, count: (await loadLiveNews()).length, message: 'Live news refreshes automatically every 10 minutes.' });
