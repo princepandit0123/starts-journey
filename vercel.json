@@ -2,7 +2,7 @@
   "version": 2,
   "rewrites": [
     {"source": "/", "destination": "/api/home"},
-    {"source": "/article/:slug", "destination": "/article.html"},
+    {"source": "/article/:slug", "destination": "/api/article?slug=:slug"},
     {"source": "/admin", "destination": "/admin.html"},
     {"source": "/bollywood", "destination": "/bollywood.html"},
     {"source": "/movies", "destination": "/movies.html"},
