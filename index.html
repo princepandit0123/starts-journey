@@ -69,4 +69,12 @@ document.getElementById('postForm').addEventListener('submit',async e=>{e.preven
 <script>
 (()=>{const ads=[{t:'Flipkart',c:'Special offers and everyday deals.',b:'SHOP NOW',k:'pop-flip'},{t:'amazon',c:'Deals, gadgets and essentials delivered to your door.',b:'EXPLORE DEALS',k:'pop-amz'},{t:'blinkit',c:'Groceries and daily essentials, delivered fast.',b:'ORDER NOW',k:'pop-blink'}];let i=0,closed=false,box=document.getElementById('popupAd');function show(){if(closed)return;const a=ads[i%ads.length];box.className='popup-ad show '+a.k;popTitle.textContent=a.t;popText.textContent=a.c;popCta.textContent=a.b;i++;}setTimeout(show,7000);setInterval(show,18000);closeAd.onclick=()=>{closed=true;box.classList.remove('show');};})();
 </script>
+<!-- STARTS JOURNEY LIVE FEED FIX -->
+<script>
+(()=>{
+ async function loadLive(){
+  try{const r=await fetch('/data/news.json?ts='+Date.now(),{cache:'no-store'});if(!r.ok)return;const live=await r.json();if(!Array.isArray(live)||!live.length)return;const seen=new Set((allArticles||[]).map(a=>a.sourceUrl||a.title||a.id));allArticles=[...live,...(allArticles||[])].filter(a=>{const k=a.sourceUrl||a.title||a.id;if(seen.has(k)&&!live.includes(a))return false;seen.add(k);return true;});if(typeof applySearch==='function')applySearch(new URLSearchParams(location.search).get('q')||'');const st=document.getElementById('liveStatus');if(st)st.querySelector('span').textContent='🔴 LIVE NEWS AUTO-UPDATE · Last sync: '+new Date().toLocaleString('en-IN');}catch(e){}}
+ loadLive();setInterval(loadLive,600000);
+})();
+</script>
 </body></html>
