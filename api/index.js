@@ -14,7 +14,10 @@ function fixAshishImages(a) {
   if (!a || a.subjectName !== 'Ashish Yadav') return a;
   const fix = (src) => {
     const m = String(src || '').match(/ashish-yadav-photo-(\d+)\.(?:jpe?g)/i);
-    return m ? `https://raw.githubusercontent.com/princepandit0123/starts-journey/main/uploads/ashish-yadav-photo-${m[1]}.jpg?v=1` : src;
+    if (!m) return src;
+    const n = Number(m[1]);
+    const ext = n <= 3 ? 'jpeg' : 'jpg';
+    return `https://raw.githubusercontent.com/princepandit0123/starts-journey/main/uploads/ashish-yadav-photo-${n}.${ext}?v=2`;
   };
   return { ...a, image: fix(a.image), subjectImage: fix(a.subjectImage), gallery: Array.isArray(a.gallery) ? a.gallery.map(g => ({ ...g, image: fix(g.image) })) : a.gallery };
 }
@@ -27,6 +30,27 @@ function decodeXml(s) {
 function tag(block, name) {
   const m = block.match(new RegExp(`<${name}(?:\\s[^>]*)?>([\\s\\S]*?)</${name}>`, 'i'));
   return m ? decodeXml(m[1]) : '';
+}
+
+function imageFromItem(block) {
+  const media = block.match(/<media:(?:content|thumbnail)\b[^>]*\burl=["']([^"']+)["'][^>]*>/i);
+  if (media && media[1]) return media[1];
+  const enclosure = block.match(/<enclosure\b[^>]*\burl=["']([^"']+)["'][^>]*>/i);
+  if (enclosure && enclosure[1]) return enclosure[1];
+  const description = block.match(/<description[^>]*>([\s\S]*?)<\/description>/i);
+  if (description) {
+    const img = description[1].match(/<img[^>]+src=["']([^"']+)["']/i);
+    if (img && img[1]) return img[1];
+  }
+  return '';
+}
+
+function themeImage(title) {
+  const t = String(title || '').toLowerCase();
+  if (/cricket|ipl|bcci|virat|rohit|team india|match|wicket/.test(t)) return 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=1400&q=85';
+  if (/ott|web series|netflix|prime video|series|streaming/.test(t)) return 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?auto=format&fit=crop&w=1400&q=85';
+  if (/bollywood|actor|actress|celebrity|star|film|movie|cinema/.test(t)) return 'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=1400&q=85';
+  return 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=1400&q=85';
 }
 
 async function loadLiveNews() {
@@ -45,12 +69,13 @@ async function loadLiveNews() {
         const title = tag(block, 'title');
         const sourceUrl = tag(block, 'link');
         if (!title || !sourceUrl) continue;
+        const image = imageFromItem(block) || themeImage(title);
         out.push({
           id: `live-${Date.now().toString(36)}-${out.length}`,
           title,
           description: tag(block, 'description'),
-          category: 'ENTERTAINMENT · LIVE NEWS',
-          image: '',
+          category: /cricket|ipl|bcci|virat|rohit|match|wicket/i.test(title) ? 'CRICKET · LIVE NEWS' : /ott|web series|netflix|prime video|streaming/i.test(title) ? 'OTT · LIVE NEWS' : 'ENTERTAINMENT · LIVE NEWS',
+          image,
           source: tag(block, 'source') || 'Google News',
           sourceUrl,
           publishedAt: tag(block, 'pubDate') || new Date().toISOString(),
