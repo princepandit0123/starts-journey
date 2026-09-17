@@ -12,9 +12,9 @@ const ASHISH = {
   source: 'STARTS JOURNEY',
   author: 'STARTS JOURNEY Editorial',
   readTime: '5 min read',
-  image: 'https://raw.githubusercontent.com/princepandit0123/starts-journey/main/uploads/ashish-yadav-photo-1.jpeg?v=6',
+  image: 'https://raw.githubusercontent.com/princepandit0123/starts-journey/main/uploads/ashish-yadav-photo-1.jpeg?v=8',
   tags: ['Ashish Yadav','Jhansi','Content Creator','Fashion','Lifestyle','Travel','Instagram Creator'],
-  gallery: [1,2,3].map(n => ({image:`https://raw.githubusercontent.com/princepandit0123/starts-journey/main/uploads/ashish-yadav-photo-${n}.jpeg?v=6`})).concat([4,5,6,7,8,9].map(n => ({image:`https://raw.githubusercontent.com/princepandit0123/starts-journey/main/uploads/ashish-yadav-photo-${n}.jpg?v=6`})))
+  gallery: [1,2,3].map(n => ({image:`https://raw.githubusercontent.com/princepandit0123/starts-journey/main/uploads/ashish-yadav-photo-${n}.jpeg?v=8`})).concat([4,5,6,7,8,9].map(n => ({image:`https://raw.githubusercontent.com/princepandit0123/starts-journey/main/uploads/ashish-yadav-photo-${n}.jpg?v=8`})))
 };
 
 function loadFallback() {
@@ -33,7 +33,7 @@ function fixAshishImages(a) {
     if (!m) return src;
     const n = Number(m[1]);
     const ext = n <= 3 ? 'jpeg' : 'jpg';
-    return `https://raw.githubusercontent.com/princepandit0123/starts-journey/main/uploads/ashish-yadav-photo-${n}.${ext}?v=6`;
+    return `https://raw.githubusercontent.com/princepandit0123/starts-journey/main/uploads/ashish-yadav-photo-${n}.${ext}?v=8`;
   };
   return { ...a, image: fix(a.image), subjectImage: fix(a.subjectImage), gallery: Array.isArray(a.gallery) ? a.gallery.map(g => ({ ...g, image: fix(g.image) })) : a.gallery };
 }
@@ -47,7 +47,9 @@ function tag(block, name) {
   return m ? decodeXml(m[1]) : '';
 }
 
-// Only use an image that belongs to the RSS item itself. No generic/theme fallback.
+// Use the publisher/RSS image when the feed provides one. The homepage then
+// resolves the publisher's original image. Only when that cannot be resolved
+// do we keep the category-specific theme fallback.
 function imageFromItem(block) {
   const candidates = [
     /<media:(?:content|thumbnail)\b[^>]*\burl=["']([^"']+)["'][^>]*>/i,
@@ -59,18 +61,26 @@ function imageFromItem(block) {
     const m = block.match(re);
     if (!m) continue;
     if (re === candidates[2] || re === candidates[3]) {
-      const img = m[1].match(/<img[^>]+(?:src|data-src)=["']([^"']+)["']/i);
-      if (img && /^https?:\/\//i.test(img[1])) return img[1];
+      const img = m[1].match(/<(?:img|source)[^>]+(?:src|data-src|srcset)=["']([^"']+)["']/i);
+      if (img && /^https?:\/\//i.test(img[1])) return img[1].split(',')[0].trim().split(' ')[0];
     } else if (m[1] && /^https?:\/\//i.test(m[1])) return m[1];
   }
   return '';
+}
+
+function themeImage(title) {
+  const t = String(title || '').toLowerCase();
+  if (/cricket|ipl|bcci|virat|rohit|team india|match|wicket/.test(t)) return 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=1400&q=85';
+  if (/ott|web series|netflix|prime video|series|streaming/.test(t)) return 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?auto=format&fit=crop&w=1400&q=85';
+  if (/bollywood|actor|actress|celebrity|star|film|movie|cinema/.test(t)) return 'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=1400&q=85';
+  return 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=1400&q=85';
 }
 
 async function loadLiveNews() {
   if (Date.now() - liveCache.at < 10 * 60 * 1000 && liveCache.articles.length) return liveCache.articles;
   const feeds = [
     'https://news.google.com/rss/search?q=Bollywood+OR+Hindi+cinema+OR+OTT+OR+celebrity+when:2h&hl=en-IN&gl=IN&ceid=IN:en',
-    'https://news.google.com/rss/search?q=Indian+entertainment+OR+film+OR+web+series+when:2h&hl=en-IN&gl=IN&ceid=IN:en'
+    'https://news.google.com/rss/search?q=Indian+entertainment+OR+film+OR+web+series+when:2h&hl=en-IN&gl=IN&ceid=IN'
   ];
   const out = [];
   for (const url of feeds) {
@@ -82,9 +92,8 @@ async function loadLiveNews() {
         const title = tag(block, 'title');
         const sourceUrl = tag(block, 'link');
         if (!title || !sourceUrl) continue;
-        const image = imageFromItem(block);
-        // If the publisher did not provide an article image, skip the story rather than using a fake/shared image.
-        if (!image) continue;
+        const sourceImage = imageFromItem(block);
+        const image = sourceImage || themeImage(title);
         out.push({
           id: `live-${Buffer.from(sourceUrl).toString('base64url').slice(0,32)}`,
           title,
@@ -97,7 +106,8 @@ async function loadLiveNews() {
           updatedAt: new Date().toISOString(),
           author: 'STARTS JOURNEY Live Desk',
           readTime: '3 min read',
-          live: true
+          live: true,
+          hasSourceImage: !!sourceImage
         });
         if (out.length >= 30) break;
       }
@@ -113,14 +123,15 @@ async function loadLiveNews() {
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store, max-age=0');
   const p = (req.url || '').split('?')[0];
-  if (p === '/api/health') return res.status(200).json({ ok: true, vercel: true, build: 'real-images-only-v7' });
+  if (p === '/api/health') return res.status(200).json({ ok: true, vercel: true, build: 'source-image-with-fallback-v8' });
   if (p === '/api/content') {
     const fallback = loadFallback().map(fixAshishImages);
     const live = await loadLiveNews();
+    // Live news comes first; fallback stories remain only as backup content.
     const combined = [ASHISH, ...live, ...fallback.filter(a => a.id !== ASHISH.id && a.subjectName !== 'Ashish Yadav')];
     const seen = new Set();
     const articles = combined.filter(a => { const k = a.sourceUrl || a.id || a.title; if (seen.has(k)) return false; seen.add(k); return true; }).slice(0, 200);
-    return res.status(200).json({ ticker: 'BREAKING · LIVE NEWS · CRICKET · BOLLYWOOD · CELEBRITIES', articles, lastSync: live.length ? live[0].updatedAt : null, build: 'real-images-only-v7' });
+    return res.status(200).json({ ticker: 'BREAKING · LIVE NEWS · CRICKET · BOLLYWOOD · CELEBRITIES', articles, lastSync: live.length ? live[0].updatedAt : null, build: 'source-image-with-fallback-v8' });
   }
   if (p === '/api/sync-news') return res.status(200).json({ ok: true, count: (await loadLiveNews()).length, message: 'Live news refreshes automatically every 10 minutes.' });
   return res.status(404).json({ error: 'API route not found' });
