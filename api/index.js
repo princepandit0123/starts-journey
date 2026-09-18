@@ -38,6 +38,14 @@ function fixAshishImages(a) {
   return { ...a, image: fix(a.image), subjectImage: fix(a.subjectImage), gallery: Array.isArray(a.gallery) ? a.gallery.map(g => ({ ...g, image: fix(g.image) })) : a.gallery };
 }
 
+function cleanText(s) {
+  return decodeXml(s).replace(/\\s+/g, ' ').trim();
+}
+
+function titleKey(s) {
+  return cleanText(s).toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+}
+
 function decodeXml(s) {
   return String(s || '').replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').replace(/<[^>]+>/g, '')
     .replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').trim();
@@ -72,6 +80,8 @@ function themeImage(title) {
   const t = String(title || '').toLowerCase();
   if (/cricket|ipl|bcci|virat|rohit|team india|match|wicket/.test(t)) return 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=1400&q=85';
   if (/ott|web series|netflix|prime video|series|streaming/.test(t)) return 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?auto=format&fit=crop&w=1400&q=85';
+  if (/music|song|singer|concert|album/.test(t)) return 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1400&q=85';
+  if (/travel|luxury|lifestyle/.test(t)) return 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=85';
   if (/bollywood|actor|actress|celebrity|star|film|movie|cinema/.test(t)) return 'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=1400&q=85';
   return 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=1400&q=85';
 }
@@ -97,7 +107,7 @@ async function loadLiveNews() {
         out.push({
           id: `live-${Buffer.from(sourceUrl).toString('base64url').slice(0,32)}`,
           title,
-          description: tag(block, 'description'),
+          description: cleanText(tag(block, 'description')),
           category: /cricket|ipl|bcci|virat|rohit|match|wicket/i.test(title) ? 'CRICKET · LIVE NEWS' : /ott|web series|netflix|prime video|streaming/i.test(title) ? 'OTT · LIVE NEWS' : 'ENTERTAINMENT · LIVE NEWS',
           image,
           source: tag(block, 'source') || 'Google News',
@@ -114,8 +124,15 @@ async function loadLiveNews() {
     } catch (e) {}
     if (out.length >= 30) break;
   }
-  const seen = new Set();
-  const unique = out.filter(a => { if (seen.has(a.sourceUrl)) return false; seen.add(a.sourceUrl); return true; }).slice(0, 30);
+  const seenUrl = new Set();
+  const seenTitle = new Set();
+  const unique = out.filter(a => {
+    const tk = titleKey(a.title);
+    if (seenUrl.has(a.sourceUrl) || (tk && seenTitle.has(tk))) return false;
+    seenUrl.add(a.sourceUrl);
+    if (tk) seenTitle.add(tk);
+    return true;
+  }).slice(0, 30);
   if (unique.length) liveCache = { at: Date.now(), articles: unique };
   return unique;
 }
@@ -130,7 +147,15 @@ module.exports = async (req, res) => {
     // Live news comes first; fallback stories remain only as backup content.
     const combined = [ASHISH, ...live, ...fallback.filter(a => a.id !== ASHISH.id && a.subjectName !== 'Ashish Yadav')];
     const seen = new Set();
-    const articles = combined.filter(a => { const k = a.sourceUrl || a.id || a.title; if (seen.has(k)) return false; seen.add(k); return true; }).slice(0, 200);
+    const seenTitles = new Set();
+    const articles = combined.filter(a => {
+      const k = a.sourceUrl || a.id || a.title;
+      const tk = titleKey(a.title);
+      if (seen.has(k) || (tk && seenTitles.has(tk))) return false;
+      seen.add(k);
+      if (tk) seenTitles.add(tk);
+      return true;
+    }).slice(0, 200);
     return res.status(200).json({ ticker: 'BREAKING · LIVE NEWS · CRICKET · BOLLYWOOD · CELEBRITIES', articles, lastSync: live.length ? live[0].updatedAt : null, build: 'source-image-with-fallback-v8' });
   }
   if (p === '/api/sync-news') return res.status(200).json({ ok: true, count: (await loadLiveNews()).length, message: 'Live news refreshes automatically every 10 minutes.' });
