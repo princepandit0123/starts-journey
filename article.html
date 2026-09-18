@@ -230,4 +230,8 @@ load();
 <script>
 (()=>{const base='https://raw.githubusercontent.com/princepandit0123/starts-journey/main/uploads/';const map={'ashish-yadav-photo-1.jpeg':'ashish-yadav-photo-4.jpg','ashish-yadav-photo-2.jpeg':'ashish-yadav-photo-5.jpg','ashish-yadav-photo-3.jpeg':'ashish-yadav-photo-6.jpg'};function fix(){document.querySelectorAll('img').forEach(img=>{const src=img.getAttribute('src')||'';for(const [bad,good] of Object.entries(map)){if(src.includes(bad)){img.src=base+good+'?v=9';break;}}});}fix();new MutationObserver(fix).observe(document.documentElement,{subtree:true,childList:true});})();
 </script>
+<!-- STARTS JOURNEY ASHISH PHOTO FIX -->
+<script>
+(()=>{const base='https://raw.githubusercontent.com/princepandit0123/starts-journey/main/uploads/';function fix(){document.querySelectorAll('img[src*="ashish-yadav-photo"]').forEach(img=>{const m=img.src.match(/ashish-yadav-photo-(\d+)\.(?:jpe?g)/i);if(m)img.src=base+'ashish-yadav-photo-'+m[1]+'.jpg?v=1';});}fix();new MutationObserver(fix).observe(document.documentElement,{subtree:true,childList:true});setInterval(fix,3000);})();
+</script>
 </body></html>
