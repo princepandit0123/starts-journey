@@ -2,6 +2,8 @@ const fs = require('fs');
 const path = require('path');
 
 module.exports = (req, res) => {
+  res.setHeader('Cache-Control', 'no-store, max-age=0, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
   try {
     const html = fs.readFileSync(path.join(process.cwd(), 'article.html'), 'utf8');
     const slug = String((req.query && req.query.slug) || '').replace(/'/g, "\'");
