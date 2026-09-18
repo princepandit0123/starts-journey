@@ -12,9 +12,15 @@ const ASHISH = {
   source: 'STARTS JOURNEY',
   author: 'STARTS JOURNEY Editorial',
   readTime: '5 min read',
-  image: 'https://raw.githubusercontent.com/princepandit0123/starts-journey/main/uploads/ashish-yadav-photo-1.jpeg?v=8',
+  image: '/uploads/ashish-yadav-photo-4.jpg',
+  subjectImage: '/uploads/ashish-yadav-photo-4.jpg',
   tags: ['Ashish Yadav','Jhansi','Content Creator','Fashion','Lifestyle','Travel','Instagram Creator'],
-  gallery: [1,2,3].map(n => ({image:`https://raw.githubusercontent.com/princepandit0123/starts-journey/main/uploads/ashish-yadav-photo-${n}.jpeg?v=8`})).concat([4,5,6,7,8,9].map(n => ({image:`https://raw.githubusercontent.com/princepandit0123/starts-journey/main/uploads/ashish-yadav-photo-${n}.jpg?v=8`})))
+  gallery: [
+    { image:'/uploads/ashish-yadav-photo-4.jpg', caption:'A relaxed moment that captures Ashish’s effortless style away from the spotlight.' },
+    { image:'/uploads/ashish-yadav-photo-7.jpg', caption:'A polished travel look reflecting the confidence and attention to detail behind his visual identity.' },
+    { image:'/uploads/ashish-yadav-photo-8.jpg', caption:'A calm luxury-stay moment, where understated style meets Ashish’s lifestyle storytelling.' },
+    { image:'/uploads/ashish-yadav-photo-9.jpg', caption:'An outdoor fashion portrait bringing together personality, styling and a love for visual storytelling.' }
+  ]
 };
 
 function loadFallback() {
@@ -28,14 +34,30 @@ function loadFallback() {
 
 function fixAshishImages(a) {
   if (!a || a.subjectName !== 'Ashish Yadav') return a;
+  const valid = [4,7,8,9];
+  const fallback = '/uploads/ashish-yadav-photo-4.jpg';
   const fix = (src) => {
-    const m = String(src || '').match(/ashish-yadav-photo-(\d+)\.(?:jpe?g)/i);
-    if (!m) return src;
+    const s = String(src || '');
+    const m = s.match(/ashish-yadav-photo-(\d+)\.(?:jpe?g)/i);
+    if (!m) return s;
     const n = Number(m[1]);
-    const ext = n <= 3 ? 'jpeg' : 'jpg';
-    return `https://raw.githubusercontent.com/princepandit0123/starts-journey/main/uploads/ashish-yadav-photo-${n}.${ext}?v=8`;
+    return valid.includes(n) ? `/uploads/ashish-yadav-photo-${n}.jpg` : fallback;
   };
-  return { ...a, image: fix(a.image), subjectImage: fix(a.subjectImage), gallery: Array.isArray(a.gallery) ? a.gallery.map(g => ({ ...g, image: fix(g.image) })) : a.gallery };
+  return {
+    ...a,
+    image: fix(a.image),
+    subjectImage: fix(a.subjectImage),
+    gallery: Array.isArray(a.gallery) ? a.gallery.map((g,i) => ({
+      ...g,
+      image: fix(g.image),
+      caption: g.caption || [
+        'A relaxed moment that captures Ashish’s effortless style away from the spotlight.',
+        'A polished travel look reflecting the confidence and attention to detail behind his visual identity.',
+        'A calm luxury-stay moment, where understated style meets Ashish’s lifestyle storytelling.',
+        'An outdoor fashion portrait bringing together personality, styling and a love for visual storytelling.'
+      ][i % 4]
+    })) : a.gallery
+  };
 }
 
 function cleanText(s) {
