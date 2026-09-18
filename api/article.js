@@ -8,6 +8,7 @@ module.exports = (req, res) => {
     const html = fs.readFileSync(path.join(process.cwd(), 'article.html'), 'utf8');
     const slug = String((req.query && req.query.slug) || '').replace(/'/g, "\'");
     const patch = `
+<script src="/assets/journey-upgrade.js"></script>
 <script id="sj-live-article-fix">
 (function(){
   const wanted=${JSON.stringify(slug)};
