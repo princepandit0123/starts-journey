@@ -202,7 +202,7 @@ const LOCAL_ARTICLES=[{"id":"elvish-yadav-journey","title":"Elvish Yadav: From Y
     <h1>${esc(a.title)}</h1>
     <div class="dek">${esc(a.description||'')}</div>
     ${dealsWidgetHtml}
-    <div class="byline"><div class="avatar" aria-label="Ristika">R</div><div class="bylineText">By <strong>${esc(AUTHOR_NAME)}</strong><br>${new Date(a.publishedAt||Date.now()).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})} · ${esc(a.readTime||'8 min read')}</div></div>
+    <div class="byline"><img class="avatar" src="/uploads/ristika-ai-girl.svg" alt="AI-made editorial avatar for Ristika"><div class="bylineText">By <strong>${esc(AUTHOR_NAME)}</strong><br>${new Date(a.publishedAt||Date.now()).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})} · ${esc(a.readTime||'8 min read')}</div></div>
     <img class="hero" src="${esc(media(a.image||avatar))}" alt="${esc(a.subjectName||'Article image')}">
     <div class="caption">${esc(a.imageCredit||('Profile image: '+(a.subjectName||'Featured subject')))}</div>
     <div class="body">
@@ -210,7 +210,7 @@ const LOCAL_ARTICLES=[{"id":"elvish-yadav-journey","title":"Elvish Yadav: From Y
       ${sectionsHtml}
       ${remainingGalleryHtml}
     </div>
-    <div class="profileCard"><img class="avatar" src="${esc(media(avatar))}" alt="${esc(a.subjectName||'Profile')}"><div><b>${esc(a.subjectName||'Featured subject')}</b><span>Featured profile · ${esc(a.category||'Entertainment')}</span></div></div>
+    <div class="profileCard"><img class="avatar" src="/uploads/ristika-ai-girl.svg" alt="AI-made editorial avatar"><div><b>${esc(a.subjectName||'Featured subject')}</b><span>Featured profile · ${esc(a.category||'Entertainment')}</span></div></div>
     ${tagsHtml}
     ${shareHtml}
     ${a.factNote?`<div class="source" style="border-top-color:#eee"><b>Editorial note on sourcing:</b> ${esc(a.factNote)}</div>`:''}
