@@ -92,9 +92,10 @@ nav{max-width:1240px;margin:auto;padding:0 20px 13px;display:flex;gap:24px;overf
 <footer class="footer">© 2026 STARTS JOURNEY · Editorial content &amp; source references<br><a href="/about" style="color:#ccc;margin:0 8px">About</a>·<a href="/contact" style="color:#ccc;margin:0 8px">Contact</a>·<a href="/editorial-policy" style="color:#ccc;margin:0 8px">Editorial Policy</a>·<a href="/privacy" style="color:#ccc;margin:0 8px">Privacy</a>·<a href="/terms" style="color:#ccc;margin:0 8px">Terms</a>·<a href="/disclaimer" style="color:#ccc;margin:0 8px">Disclaimer</a>·<a href="/corrections" style="color:#ccc;margin:0 8px">Corrections</a></footer>
 <script>
 const AUTHOR_NAME="Ristika";
-const AUTHOR_IMG="/uploads/author-ristika.jpg";
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const slugify=s=>String(s??'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'')||'section';
+const MEDIA_BASE="https://raw.githubusercontent.com/princepandit0123/starts-journey/main";
+const media=s=>{s=String(s||"");return s.startsWith("/uploads/")?MEDIA_BASE+s:s;};
 const id=decodeURIComponent(location.pathname.split('/').filter(Boolean).pop()||'');
 async function load(){
  try{
@@ -104,7 +105,7 @@ const LOCAL_ARTICLES=[{"id":"elvish-yadav-journey","title":"Elvish Yadav: From Y
   catch(e) { d={articles:LOCAL_ARTICLES}; }
   const a=(d.articles||[]).find(x=>x.id===id);
   if(!a) throw new Error('not found');
-  const avatar=a.subjectImage||a.image||'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=900&q=80';
+  const avatar=media(a.subjectImage||a.image||'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=900&q=80');
   document.title=a.title+' — STARTS JOURNEY';
   document.getElementById('crumbCat').textContent=a.category||'Entertainment';
   document.getElementById('crumbTitle').textContent=a.title;
@@ -146,7 +147,7 @@ const LOCAL_ARTICLES=[{"id":"elvish-yadav-journey","title":"Elvish Yadav: From Y
   let firstParaDone=false;
   const gallery = Array.isArray(a.gallery) ? a.gallery.filter(x=>x && x.image) : [];
   const galleryAfter = gallery.length ? new Map([[0, gallery[1]], [1, gallery[2]], [2, gallery[3]], [3, gallery[4]], [4, gallery[5]], [5, gallery[6]]]) : new Map();
-  const galleryHtml = (g)=>g ? `<div class="photoGallery"><figure><img src="${esc(g.image)}" alt="${esc(a.subjectName||'Article photo')}" loading="lazy"><figcaption>${esc(g.caption||'Photo supplied for this profile.')}</figcaption></figure></div>` : '';
+  const galleryHtml = (g)=>g ? `<div class="photoGallery"><figure><img src="${esc(media(g.image))}" alt="${esc(a.subjectName||'Article photo')}" loading="lazy"><figcaption>${esc(g.caption||'Photo supplied for this profile.')}</figcaption></figure></div>` : '';
   const sectionsHtml = secMeta.map((s,i)=>{
     const paras = s.paragraphs.map(p=>{
       const cls = !firstParaDone ? ' class="dropcap"' : '';
@@ -157,7 +158,7 @@ const LOCAL_ARTICLES=[{"id":"elvish-yadav-journey","title":"Elvish Yadav: From Y
     return block + (galleryAfter.get(i) ? galleryHtml(galleryAfter.get(i)) : '') + (i===midInsertAfter ? midInsertHtml : '');
   }).join('');
   const remainingGallery = gallery.slice(7);
-  const remainingGalleryHtml = remainingGallery.length ? `<div class="photoGallery">${remainingGallery.map(g=>`<figure><img src="${esc(g.image)}" alt="${esc(a.subjectName||'Article photo')}" loading="lazy"><figcaption>${esc(g.caption||'Photo supplied for this profile.')}</figcaption></figure>`).join('')}</div>` : '';
+  const remainingGalleryHtml = remainingGallery.length ? `<div class="photoGallery">${remainingGallery.map(g=>`<figure><img src="${esc(media(g.image))}" alt="${esc(a.subjectName||'Article photo')}" loading="lazy"><figcaption>${esc(g.caption||'Photo supplied for this profile.')}</figcaption></figure>`).join('')}</div>` : '';
 
   // Hashtag chips: explicit article.tags when supplied, else derived from subject/category
   const chipSet=new Set();
@@ -201,15 +202,15 @@ const LOCAL_ARTICLES=[{"id":"elvish-yadav-journey","title":"Elvish Yadav: From Y
     <h1>${esc(a.title)}</h1>
     <div class="dek">${esc(a.description||'')}</div>
     ${dealsWidgetHtml}
-    <div class="byline"><img class="avatar" src="${esc(AUTHOR_IMG)}" alt="${esc(AUTHOR_NAME)}"><div class="bylineText">By <strong>${esc(AUTHOR_NAME)}</strong><br>${new Date(a.publishedAt||Date.now()).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})} · ${esc(a.readTime||'8 min read')}</div></div>
-    <img class="hero" src="${esc(a.image||avatar)}" alt="${esc(a.subjectName||'Article image')}">
+    <div class="byline"><div class="avatar" aria-label="Ristika">R</div><div class="bylineText">By <strong>${esc(AUTHOR_NAME)}</strong><br>${new Date(a.publishedAt||Date.now()).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})} · ${esc(a.readTime||'8 min read')}</div></div>
+    <img class="hero" src="${esc(media(a.image||avatar))}" alt="${esc(a.subjectName||'Article image')}">
     <div class="caption">${esc(a.imageCredit||('Profile image: '+(a.subjectName||'Featured subject')))}</div>
     <div class="body">
       ${contentsHtml}
       ${sectionsHtml}
       ${remainingGalleryHtml}
     </div>
-    <div class="profileCard"><img class="avatar" src="${esc(avatar)}" alt="${esc(a.subjectName||'Profile')}"><div><b>${esc(a.subjectName||'Featured subject')}</b><span>Featured profile · ${esc(a.category||'Entertainment')}</span></div></div>
+    <div class="profileCard"><img class="avatar" src="${esc(media(avatar))}" alt="${esc(a.subjectName||'Profile')}"><div><b>${esc(a.subjectName||'Featured subject')}</b><span>Featured profile · ${esc(a.category||'Entertainment')}</span></div></div>
     ${tagsHtml}
     ${shareHtml}
     ${a.factNote?`<div class="source" style="border-top-color:#eee"><b>Editorial note on sourcing:</b> ${esc(a.factNote)}</div>`:''}
@@ -227,6 +228,6 @@ document.getElementById('searchForm').addEventListener('submit',e=>{e.preventDef
 load();
 </script><!-- STARTS JOURNEY ASHISH PHOTO FIX -->
 <script>
-(()=>{const base='https://raw.githubusercontent.com/princepandit0123/starts-journey/main/uploads/';function fix(){document.querySelectorAll('img[src*="ashish-yadav-photo"]').forEach(img=>{const m=img.src.match(/ashish-yadav-photo-(\d+)\.(?:jpe?g)/i);if(m)img.src=base+'ashish-yadav-photo-'+m[1]+'.jpg?v=1';});}fix();new MutationObserver(fix).observe(document.documentElement,{subtree:true,childList:true});setInterval(fix,3000);})();
+(()=>{const base='https://raw.githubusercontent.com/princepandit0123/starts-journey/main/uploads/';function fix(){document.querySelectorAll('img[src*="ashish-yadav-photo"]').forEach(img=>{const m=img.src.match(/ashish-yadav-photo-(\d+)\.(?:jpe?g)/i);if(m){const n=Number(m[1]),ext=n<=3?'jpeg':'jpg';img.src=base+'ashish-yadav-photo-'+n+'.'+ext+'?v=8';}});}fix();new MutationObserver(fix).observe(document.documentElement,{subtree:true,childList:true});})();
 </script>
 </body></html>
