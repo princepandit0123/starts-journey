@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-  const KEY='sj-saved-v1', THEME='sj-theme-v1';
+  const KEY='sj-saved-v1', THEME='sj-theme-v2', SEARCH='sj-recent-searches-v1', VIEWS='sj-views-v1';
   const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
   const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const getSaved=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return[]}};
@@ -47,17 +47,18 @@
     document.head.appendChild(s);
   }
   function theme(){
-    const dark=localStorage.getItem(THEME)==='dark';
+    const pref=localStorage.getItem(THEME)||'system';
+    const dark=pref==='dark'||(pref==='system'&&matchMedia('(prefers-color-scheme: dark)').matches);
     document.body.classList.toggle('sj-dark',dark);
   }
   function addHub(){
     if($('.sj-hub')||!$('header'))return;
     const nav=$('header');
     const hub=document.createElement('div');hub.className='sj-hub';
-    hub.innerHTML='<span class="sj-hub-title">JOURNEY TOOLS</span><button class="sj-tool" data-sj="saved">SAVED <span id="sjSavedCount">0</span></button><button class="sj-tool" data-sj="theme">DARK MODE</button><button class="sj-filter active" data-cat="ALL">ALL</button><button class="sj-filter" data-cat="MOVIES">MOVIES</button><button class="sj-filter" data-cat="OTT">OTT</button><button class="sj-filter" data-cat="CELEBRITIES">CELEBRITIES</button><button class="sj-filter" data-cat="CREATORS">CREATORS</button>';
+    hub.innerHTML='<span class="sj-hub-title">JOURNEY TOOLS</span><button class="sj-tool" data-sj="saved">SAVED <span id="sjSavedCount">0</span></button><button class="sj-tool" data-sj="theme">THEME: SYSTEM</button><button class="sj-filter active" data-cat="ALL">ALL</button><button class="sj-filter" data-cat="BOLLYWOOD">BOLLYWOOD</button><button class="sj-filter" data-cat="MOVIES">MOVIES</button><button class="sj-filter" data-cat="OTT">OTT</button><button class="sj-filter" data-cat="WEB SERIES">WEB SERIES</button><button class="sj-filter" data-cat="CELEBRITIES">CELEBRITIES</button><button class="sj-filter" data-cat="CREATORS">CREATORS</button><button class="sj-filter" data-cat="HOLLYWOOD">HOLLYWOOD</button><button class="sj-filter" data-cat="REVIEWS">REVIEWS</button><button class="sj-filter" data-cat="BOX OFFICE">BOX OFFICE</button><button class="sj-filter" data-cat="CRICKET">CRICKET</button>';
     nav.insertAdjacentElement('afterend',hub);
     $$('.sj-filter',hub).forEach(b=>b.addEventListener('click',()=>{ $$('.sj-filter',hub).forEach(x=>x.classList.remove('active'));b.classList.add('active');filterCards(b.dataset.cat); }));
-    $('[data-sj="theme"]',hub).addEventListener('click',()=>{document.body.classList.toggle('sj-dark');localStorage.setItem(THEME,document.body.classList.contains('sj-dark')?'dark':'light');});
+    $('[data-sj="theme"]',hub).addEventListener('click',()=>{const cur=localStorage.getItem(THEME)||'system';const next=cur==='system'?'dark':cur==='dark'?'light':'system';localStorage.setItem(THEME,next);theme();$('[data-sj="theme"]',hub).textContent='THEME: '+next.toUpperCase();});
     $('[data-sj="saved"]',hub).addEventListener('click',toggleSaved);
     updateSavedCount();
   }
@@ -102,7 +103,7 @@
       btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();toggleSave({id:slug,title:(card.querySelector('h3')||{}).textContent||link.textContent,image:card.querySelector('img')?.src||'',url:link.href});});
       share.addEventListener('click',async e=>{e.preventDefault();e.stopPropagation();const data={title:(card.querySelector('h3')||{}).textContent||'STARTS JOURNEY',url:link.href};try{if(navigator.share)await navigator.share(data);else{await navigator.clipboard.writeText(data.url);share.textContent='COPIED';setTimeout(()=>share.textContent='SHARE',1200)}}catch(err){}});
     });
-    updateSavedCount();
+    updateSavedCount();trackViews();
   }
   function toggleSave(item){
     let a=getSaved(),i=a.findIndex(x=>x.id===item.id);
@@ -110,6 +111,16 @@
     setSaved(a);updateSavedCount();decorateCards();renderSaved();
   }
   function updateSavedCount(){const c=$('#sjSavedCount');if(c)c.textContent=getSaved().length;}
+  function trackViews(){
+    let v={};try{v=JSON.parse(localStorage.getItem(VIEWS)||'{}')}catch(e){}
+    $('#newsGrid a[href*="/article/"]').forEach(a=>{const id=slugFrom(a);if(!id||a.dataset.sjViewBound)return;a.dataset.sjViewBound='1';a.addEventListener('click',()=>{v[id]=(v[id]||0)+1;localStorage.setItem(VIEWS,JSON.stringify(v));});});
+  }
+  function recentSearches(){
+    try{return JSON.parse(localStorage.getItem(SEARCH)||'[]')}catch(e){return[]}
+  }
+  function rememberSearch(q){
+    if(!q)return;let a=recentSearches().filter(x=>x.toLowerCase()!==q.toLowerCase());a.unshift(q);localStorage.setItem(SEARCH,JSON.stringify(a.slice(0,8)));
+  }
   function panel(){
     let p=$('.sj-saved-panel');if(p)return p;
     p=document.createElement('aside');p.className='sj-saved-panel';p.innerHTML='<div class="sj-saved-head"><span>Saved Stories</span><button id="sjCloseSaved" class="sj-tool">CLOSE</button></div><div id="sjSavedList"></div>';document.body.appendChild(p);
@@ -128,6 +139,6 @@
     const update=()=>{const h=document.documentElement.scrollHeight-innerHeight;progress.style.width=(h>0?(scrollY/h)*100:0)+'%'};addEventListener('scroll',update,{passive:true});update();
   }
   function backTop(){const b=document.createElement('button');b.className='sj-top';b.textContent='↑';b.title='Back to top';document.body.appendChild(b);addEventListener('scroll',()=>b.classList.toggle('show',scrollY>600),{passive:true});b.onclick=()=>scrollTo({top:0,behavior:'smooth'});}
-  function init(){addStyles();theme();addHub();addDay();backTop();if($('#article'))articleMode();setTimeout(decorateCards,700);setTimeout(decorateCards,1800);}
+  function init(){addStyles();theme();addHub();addDay();backTop();if($('#article'))articleMode();setTimeout(decorateCards,700);setTimeout(decorateCards,1800);setTimeout(trackViews,2200);if(matchMedia){matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change',theme);}}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
