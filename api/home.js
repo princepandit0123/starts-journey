@@ -3,7 +3,10 @@ const path = require('path');
 
 module.exports = (req, res) => {
   try {
-    const html = fs.readFileSync(path.join(process.cwd(), 'index.html'), 'utf8');
+    let html = fs.readFileSync(path.join(process.cwd(), 'index.html'), 'utf8');
+    // The legacy client-side live-feed merger re-adds /data/news.json on top of /api/content,
+    // which duplicates live stories. /api/content is now the single source of live news.
+    html = html.replace(/<!-- STARTS JOURNEY LIVE FEED FIX -->[\\s\\S]*?<\\/script>\\s*(?=<\\/body>)/, '');
     const patch = `
 <style id="sj-fix-style">.sj-fix-results{max-width:1240px;margin:18px auto;padding:0 20px}.sj-fix-results>div{background:#fff;border:1px solid #ddd9d3;padding:20px}.sj-fix-result{display:flex;gap:14px;padding:13px 0;border-top:1px solid #eee;text-decoration:none;color:#111}.sj-fix-result img{width:120px;height:80px;object-fit:cover;background:#eee}.sj-fix-result h3{font-family:Georgia,serif;font-size:19px;margin:0 0 6px}.sj-fix-result p{font-size:12px;color:#666;margin:0}</style>
 <script id="sj-fix-script">
