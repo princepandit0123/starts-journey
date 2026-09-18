@@ -12,16 +12,15 @@ const ASHISH = {
   source: 'STARTS JOURNEY',
   author: 'STARTS JOURNEY Editorial',
   readTime: '5 min read',
-  image: '/uploads/ashish-yadav-photo-4.jpg',
-  subjectImage: '/uploads/ashish-yadav-photo-4.jpg',
+  image: '/uploads/ashish-yadav-photo-9.jpg',
+  subjectImage: '/uploads/ashish-yadav-photo-9.jpg',
   tags: ['Ashish Yadav','Jhansi','Content Creator','Fashion','Lifestyle','Travel','Instagram Creator'],
   gallery: [
-    { image:'/uploads/ashish-yadav-photo-4.jpg', caption:'A relaxed moment that captures Ashish’s effortless style away from the spotlight.' },
-    { image:'/uploads/ashish-yadav-photo-7.jpg', caption:'A polished travel look reflecting the confidence and attention to detail behind his visual identity.' },
-    { image:'/uploads/ashish-yadav-photo-8.jpg', caption:'A calm luxury-stay moment, where understated style meets Ashish’s lifestyle storytelling.' },
-    { image:'/uploads/ashish-yadav-photo-9.jpg', caption:'An outdoor fashion portrait bringing together personality, styling and a love for visual storytelling.' }
+    { image:'/uploads/ashish-yadav-photo-9.jpg', caption:'A refined outdoor portrait that brings Ashish’s personal style, confidence and visual identity into focus.' },
+    { image:'/uploads/ashish-yadav-photo-4.jpg', caption:'A relaxed game of pool — a candid glimpse of the personality and easygoing energy behind the creator.' }
   ]
 };
+
 
 function loadFallback() {
   try {
@@ -34,7 +33,7 @@ function loadFallback() {
 
 function fixAshishImages(a) {
   if (!a || a.subjectName !== 'Ashish Yadav') return a;
-  const valid = [4,7,8,9];
+  const valid = [4,9];
   const fallback = '/uploads/ashish-yadav-photo-4.jpg';
   const fix = (src) => {
     const s = String(src || '');
