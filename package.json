@@ -3,5 +3,5 @@
   "version": "1.0.0",
   "private": true,
   "description": "STARTS JOURNEY - static site with Vercel serverless API routes",
-  "engines": { "node": "22.x" }
+  "engines": { "node": "24.x" }
 }
