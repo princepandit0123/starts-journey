@@ -35,7 +35,22 @@ module.exports = (req, res) => {
   }
   async function run(){
     try{
-      const list=await getList();const a=resolve(list);
+      const list=await getList();let a=resolve(list);
+      // Keep the Ashish feature article independent of the live-feed/API cache.
+      // This guarantees the exact article URL renders even if /api/content is stale.
+      if(!a && wanted==='ashish-yadav-jhansi-luxury-digital-life'){
+        a={
+          id:wanted,
+          subjectName:'Ashish Yadav',
+          title:'From Jhansi to a Luxury-Led Digital Life: The Story of Ashish Yadav',
+          description:'How a student from Jhansi turned an Oppo A15s into his first creative tool, built an audience of 400K+, and carved out a distinct identity through fashion, lifestyle and travel.',
+          category:'LIFESTYLE · CREATOR',
+          author:'STARTS JOURNEY Editorial',
+          readTime:'8 min read',
+          image:'/uploads/ashish-yadav-photo-9.jpg',
+          tags:['Ashish Yadav','Jhansi','Creator','Fashion','Lifestyle','Travel']
+        };
+      }
       if(!a){document.title='Story not found — STARTS JOURNEY';return;}
       const main=document.getElementById('article');if(!main)return;
       const gallery=Array.isArray(a.gallery)?a.gallery:[];
