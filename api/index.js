@@ -11,16 +11,51 @@ const ASHISH = {
   subjectName: 'Ashish Yadav',
   source: 'STARTS JOURNEY',
   author: 'STARTS JOURNEY Editorial',
-  readTime: '5 min read',
+  readTime: '8 min read',
   image: '/uploads/ashish-yadav-photo-9.jpg',
   subjectImage: '/uploads/ashish-yadav-photo-9.jpg',
   tags: ['Ashish Yadav','Jhansi','Content Creator','Fashion','Lifestyle','Travel','Instagram Creator'],
   gallery: [
     { image:'/uploads/ashish-yadav-photo-9.jpg', caption:'A refined outdoor portrait that brings Ashish’s personal style, confidence and visual identity into focus.' },
     { image:'/uploads/ashish-yadav-photo-4.jpg', caption:'A relaxed game of pool — a candid glimpse of the personality and easygoing energy behind the creator.' }
-  ]
+  ],
+  sections: [
+    { heading:'The Beginning Nobody Saw', paragraphs:[
+      'There was no professional camera, production team or carefully planned studio when Ashish Yadav began creating content. There was simply a phone, an interest in lifestyle and fashion, and the desire to create something of his own. Like many students, his initial goal was to become an engineer, and content creation was not originally the obvious career path — it grew out of a personal interest that he eventually decided to pursue seriously.',
+      'His first platform was Instagram, and his first piece of equipment was far from a professional setup: an Oppo A15s. There were no elaborate productions. Ashish began by creating lifestyle content and learning through experimentation, figuring out what looked good, what connected with people, and what felt authentic to who he was.'
+    ]},
+    { heading:'Building a Visual Identity', paragraphs:[
+      'Over time, Ashish’s content moved beyond simply posting photographs or videos. Fashion became a major part of his visual language, while lifestyle and travel added another dimension. Photography allowed him to focus on the finer details — the setting, the outfit, the composition and the overall mood of each post.',
+      'Asked what separates his work from other creators, his answer is simple: luxury style. That aesthetic has become a recognizable part of how he presents himself online. Rather than treating content creation as just a numbers game, Ashish has focused on building a world around his content, one where fashion, travel and lifestyle come together through polished visuals.'
+    ]},
+    { heading:'The Growth That Changed Everything', paragraphs:[
+      'A major chapter in Ashish’s journey came in 2022, which he identifies as his biggest period of growth. One milestone that stands out is reaching 100,000 followers, a point that transformed content creation from a personal interest into something with real potential.',
+      'Today, that audience has grown beyond 400,000 followers on Instagram. The journey from an entry-level smartphone to a platform reaching hundreds of thousands of people reflects a larger part of his story: starting with what was available and developing through consistency.'
+    ]},
+    { heading:'From Creator to Brand Collaborator', paragraphs:[
+      'As his audience and visual identity developed, opportunities with brands began to follow. Ashish has worked with names including Snitch, Flipkart, Myntra, Amazon, Agaro, Samsung and Oppo, along with collaborations connected to hotels and hospitality across destinations such as Nainital, Delhi and Gurgaon. Across his journey, he has completed 100+ brand collaborations.',
+      'One of the moments he remembers particularly well is his first Flipkart event. For a creator who started by making lifestyle content on a smartphone in Jhansi, stepping into a professional brand event marked a very different stage of the journey — his work had begun entering the wider creator-and-brand ecosystem.'
+    ]},
+    { heading:'The Life Behind the Camera', paragraphs:[
+      'The polished images tell only one part of Ashish’s story. Behind the content is a student still balancing education with his creative career. He is currently associated with SR Group of Institutions, Jhansi, while continuing to develop his presence as a creator, describing himself as a half-time content creator and half-time student.',
+      'Balancing both has not always been easy, and he credits the support of his friends for helping him manage the demands of studies and content creation. The journey also was not initially supported by everyone in his family — a lack of early support that became one of the challenges he had to navigate while pursuing something still unfamiliar to many people around him. Yet he continued.'
+    ]},
+    { heading:'Consistency Over Everything, and the Next Chapter', paragraphs:[
+      'For Ashish, the philosophy behind success comes down to one word: consistency. It is a simple idea, but one that has shaped his journey, from creating with an Oppo A15s to building an audience of 400K+ and working with major brands. His advice to someone starting from zero is equally direct: “Do whatever you want” — a call to have the courage to explore your own direction rather than waiting for everyone else to understand it first.',
+      'Ashish’s ambitions now extend well beyond Instagram. Over the next few years, he wants to explore acting, develop his own fashion brand, take on bigger travel projects, build a creative team, and eventually become a full-time creator — a natural expansion of what he has already been building, from a solo creator with a phone to someone with a much bigger creative vision in sight.'
+    ]},
+    { heading:'From a Smartphone to a Story', paragraphs:[
+      'The most memorable part of Ashish Yadav’s journey may not be the number 400K+. It may be the distance between the beginning and where the journey has reached.',
+      'A smartphone that was once simply a device became a creative tool. A creative hobby became content. Content became an identity. That identity became an audience. And the audience became a platform for bigger possibilities.',
+      'From Jhansi to a wider digital audience, Ashish’s story represents something increasingly common among India’s young generation: the ability to create opportunities instead of waiting for them. The equipment can change, the locations can change, the fashion can change and the platforms can change — but the fundamental idea remains timeless. You do not always need to start with everything. Sometimes, you only need to start with what you have, and have the courage to keep building.'
+    ]}
+  ],
+  imageCredit: 'Photos supplied by Ashish Yadav',
+  isFeatured: true,
+  isTrending: true,
+  updatedAt: '2026-09-19T14:30:00.000Z',
+  factNote: 'Information in this profile is based on material supplied by the subject/source and publicly available profile information.'
 };
-
 
 function loadFallback() {
   try {
@@ -60,7 +95,7 @@ function fixAshishImages(a) {
 }
 
 function cleanText(s) {
-  return decodeXml(s).replace(/\\s+/g, ' ').trim();
+  return decodeXml(s).replace(/\s+/g, ' ').trim();
 }
 
 function titleKey(s) {
@@ -75,10 +110,6 @@ function tag(block, name) {
   const m = block.match(new RegExp(`<${name}(?:\\s[^>]*)?>([\\s\\S]*?)</${name}>`, 'i'));
   return m ? decodeXml(m[1]) : '';
 }
-
-// Use the publisher/RSS image when the feed provides one. The homepage then
-// resolves the publisher's original image. Only when that cannot be resolved
-// do we keep the category-specific theme fallback.
 function imageFromItem(block) {
   const candidates = [
     /<media:(?:content|thumbnail)\b[^>]*\burl=["']([^"']+)["'][^>]*>/i,
@@ -96,7 +127,6 @@ function imageFromItem(block) {
   }
   return '';
 }
-
 function themeImage(title) {
   const t = String(title || '').toLowerCase();
   if (/cricket|ipl|bcci|virat|rohit|team india|match|wicket/.test(t)) return 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=1400&q=85';
@@ -106,7 +136,6 @@ function themeImage(title) {
   if (/bollywood|actor|actress|celebrity|star|film|movie|cinema/.test(t)) return 'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=1400&q=85';
   return 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=1400&q=85';
 }
-
 async function loadLiveNews() {
   if (Date.now() - liveCache.at < 10 * 60 * 1000 && liveCache.articles.length) return liveCache.articles;
   const feeds = [
@@ -124,60 +153,44 @@ async function loadLiveNews() {
         const sourceUrl = tag(block, 'link');
         if (!title || !sourceUrl) continue;
         const sourceImage = imageFromItem(block);
-        const image = sourceImage || themeImage(title);
         out.push({
           id: `live-${Buffer.from(sourceUrl).toString('base64url').slice(0,32)}`,
-          title,
-          description: cleanText(tag(block, 'description')),
+          title, description: cleanText(tag(block, 'description')),
           category: /cricket|ipl|bcci|virat|rohit|match|wicket/i.test(title) ? 'CRICKET · LIVE NEWS' : /ott|web series|netflix|prime video|streaming/i.test(title) ? 'OTT · LIVE NEWS' : 'ENTERTAINMENT · LIVE NEWS',
-          image,
-          source: tag(block, 'source') || 'Google News',
-          sourceUrl,
-          publishedAt: tag(block, 'pubDate') || new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          author: 'STARTS JOURNEY Live Desk',
-          readTime: '3 min read',
-          live: true,
-          hasSourceImage: !!sourceImage
+          image: sourceImage || themeImage(title), source: tag(block, 'source') || 'Google News',
+          sourceUrl, publishedAt: tag(block, 'pubDate') || new Date().toISOString(),
+          updatedAt: new Date().toISOString(), author: 'STARTS JOURNEY Live Desk',
+          readTime: '3 min read', live: true, hasSourceImage: !!sourceImage
         });
         if (out.length >= 30) break;
       }
     } catch (e) {}
     if (out.length >= 30) break;
   }
-  const seenUrl = new Set();
-  const seenTitle = new Set();
+  const seenUrl = new Set(), seenTitle = new Set();
   const unique = out.filter(a => {
     const tk = titleKey(a.title);
     if (seenUrl.has(a.sourceUrl) || (tk && seenTitle.has(tk))) return false;
-    seenUrl.add(a.sourceUrl);
-    if (tk) seenTitle.add(tk);
-    return true;
+    seenUrl.add(a.sourceUrl); if (tk) seenTitle.add(tk); return true;
   }).slice(0, 30);
   if (unique.length) liveCache = { at: Date.now(), articles: unique };
   return unique;
 }
-
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store, max-age=0');
   const p = (req.url || '').split('?')[0];
-  if (p === '/api/health') return res.status(200).json({ ok: true, vercel: true, build: 'source-image-with-fallback-v8' });
+  if (p === '/api/health') return res.status(200).json({ ok: true, vercel: true, build: 'ashish-full-article-v9' });
   if (p === '/api/content') {
     const fallback = loadFallback().map(fixAshishImages);
     const live = await loadLiveNews();
-    // Live news comes first; fallback stories remain only as backup content.
     const combined = [ASHISH, ...live, ...fallback.filter(a => a.id !== ASHISH.id && a.subjectName !== 'Ashish Yadav')];
-    const seen = new Set();
-    const seenTitles = new Set();
+    const seen = new Set(), seenTitles = new Set();
     const articles = combined.filter(a => {
-      const k = a.sourceUrl || a.id || a.title;
-      const tk = titleKey(a.title);
+      const k = a.sourceUrl || a.id || a.title, tk = titleKey(a.title);
       if (seen.has(k) || (tk && seenTitles.has(tk))) return false;
-      seen.add(k);
-      if (tk) seenTitles.add(tk);
-      return true;
+      seen.add(k); if (tk) seenTitles.add(tk); return true;
     }).slice(0, 200);
-    return res.status(200).json({ ticker: 'BREAKING · LIVE NEWS · CRICKET · BOLLYWOOD · CELEBRITIES', articles, lastSync: live.length ? live[0].updatedAt : null, build: 'source-image-with-fallback-v8' });
+    return res.status(200).json({ ticker: 'BREAKING · LIVE NEWS · CRICKET · BOLLYWOOD · CELEBRITIES', articles, lastSync: live.length ? live[0].updatedAt : null, build: 'ashish-full-article-v9' });
   }
   if (p === '/api/sync-news') return res.status(200).json({ ok: true, count: (await loadLiveNews()).length, message: 'Live news refreshes automatically every 10 minutes.' });
   return res.status(404).json({ error: 'API route not found' });
