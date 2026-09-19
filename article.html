@@ -95,7 +95,7 @@ const AUTHOR_NAME="Ristika";
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const slugify=s=>String(s??'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'')||'section';
 const MEDIA_BASE="https://raw.githubusercontent.com/princepandit0123/starts-journey/main";
-const media=s=>{s=String(s||"");if(s.includes("ashish-yadav-hero.svg"))return "/uploads/ashish-yadav-photo-4.jpg?v=4";return s;};
+const media=s=>{s=String(s||"");if(s.includes("ashish-yadav-hero.svg")||s.includes("ashish-yadav-photo-")||s.startsWith("data:image/"))return "/uploads/ashish-yadav-photo-4.jpg?v=6";return s;};
 const id=decodeURIComponent(location.pathname.split('/').filter(Boolean).pop()||'');
 async function load(){
  try{
@@ -226,9 +226,5 @@ const LOCAL_ARTICLES=[{"id":"elvish-yadav-journey","title":"Elvish Yadav: From Y
 }
 document.getElementById('searchForm').addEventListener('submit',e=>{e.preventDefault();location.href='/?q='+encodeURIComponent(document.getElementById('search').value.trim())});
 load();
-</script><!-- STARTS JOURNEY ASHISH PHOTO FIX: hero image is now hosted in-repo -->
-<!-- STARTS JOURNEY ASHISH PHOTO FIX -->
-<script>
-(()=>{const base='https://raw.githubusercontent.com/princepandit0123/starts-journey/main/uploads/';function fix(){document.querySelectorAll('img[src*="ashish-yadav-photo"]').forEach(img=>{const m=img.src.match(/ashish-yadav-photo-(\d+)\.(?:jpe?g)/i);if(m)img.src=base+'ashish-yadav-photo-'+m[1]+'.jpg?v=1';});}fix();new MutationObserver(fix).observe(document.documentElement,{subtree:true,childList:true});setInterval(fix,3000);})();
-</script>
+</script><!-- Ashish image is served from the local uploads folder. -->
 </body></html>
