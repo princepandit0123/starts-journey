@@ -95,7 +95,7 @@ const AUTHOR_NAME="Ristika";
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const slugify=s=>String(s??'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'')||'section';
 const MEDIA_BASE="https://raw.githubusercontent.com/princepandit0123/starts-journey/main";
-const media=s=>{s=String(s||"");if(s.includes("ashish-yadav-hero.svg")||s.includes("ashish-yadav-photo-")||s.startsWith("data:image/"))return "/uploads/ashish-yadav-photo-4.jpg?v=9";return s;};
+const media=s=>{s=String(s||"");if(s.includes("ashish-yadav-hero.svg")||s.includes("ashish-yadav-photo-")||s.startsWith("data:image/"))return "/uploads/ashish-yadav-photo-4.jpg?v=10";return s;};
 const id=decodeURIComponent(location.pathname.split('/').filter(Boolean).pop()||'');
 async function load(){
  try{
