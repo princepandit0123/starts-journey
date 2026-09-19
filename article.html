@@ -95,7 +95,7 @@ const AUTHOR_NAME="Ristika";
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const slugify=s=>String(s??'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'')||'section';
 const MEDIA_BASE="https://raw.githubusercontent.com/princepandit0123/starts-journey/main";
-const media=s=>{s=String(s||"");if(s.includes("ashish-yadav-photo")||s.includes("ashish-yadav-hero"))return MEDIA_BASE+"/uploads/ashish-yadav-hero.svg?v=2";if(s.startsWith("/uploads/"))return MEDIA_BASE+s;return s;};
+const media=s=>{s=String(s||"");if(s.includes("ashish-yadav-hero.svg")||s.includes("ashish-yadav-photo-4")||s.includes("ashish-yadav-photo-9"))return MEDIA_BASE+"/uploads/ashish-yadav-photo-4.jpg?v=3";if(s.startsWith("/uploads/"))return MEDIA_BASE+s;return s;};
 const id=decodeURIComponent(location.pathname.split('/').filter(Boolean).pop()||'');
 async function load(){
  try{
@@ -202,9 +202,9 @@ const LOCAL_ARTICLES=[{"id":"elvish-yadav-journey","title":"Elvish Yadav: From Y
     <h1>${esc(a.title)}</h1>
     <div class="dek">${esc(a.description||'')}</div>
     ${dealsWidgetHtml}
-    <div class="byline"><img class="avatar" src="/uploads/ristika-ai-girl.svg" alt="AI-made editorial avatar for Ristika"><div class="bylineText">By <strong>${esc(AUTHOR_NAME)}</strong><br>${new Date(a.publishedAt||Date.now()).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})} · ${esc(a.readTime||'8 min read')}</div></div>
+    <div class="byline"><img class="avatar" src="/uploads/ristika-ai-girl.svg" alt="AI-made editorial avatar for Ristika"><div class="bylineText">Featuring <strong>${esc(a.subjectName||'Ashish Yadav')}</strong><br>By <strong>${esc(AUTHOR_NAME)}</strong><br>${new Date(a.publishedAt||Date.now()).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})} · ${esc(a.readTime||'8 min read')}</div></div>
     <img class="hero" src="${esc(media(a.image||avatar))}" alt="${esc(a.subjectName||'Article image')}">
-    <div class="caption">${esc(a.imageCredit||('Profile image: '+(a.subjectName||'Featured subject')))}</div>
+    <div class="caption">${esc(a.subjectName||'Ashish Yadav')} — ${esc(a.imageCredit||'Photos supplied for this profile.')}</div>
     <div class="body">
       ${contentsHtml}
       ${sectionsHtml}
