@@ -227,4 +227,8 @@ const LOCAL_ARTICLES=[{"id":"elvish-yadav-journey","title":"Elvish Yadav: From Y
 document.getElementById('searchForm').addEventListener('submit',e=>{e.preventDefault();location.href='/?q='+encodeURIComponent(document.getElementById('search').value.trim())});
 load();
 </script><!-- STARTS JOURNEY ASHISH PHOTO FIX: hero image is now hosted in-repo -->
+<!-- STARTS JOURNEY ASHISH PHOTO FIX -->
+<script>
+(()=>{const base='https://raw.githubusercontent.com/princepandit0123/starts-journey/main/uploads/';function fix(){document.querySelectorAll('img[src*="ashish-yadav-photo"]').forEach(img=>{const m=img.src.match(/ashish-yadav-photo-(\d+)\.(?:jpe?g)/i);if(m)img.src=base+'ashish-yadav-photo-'+m[1]+'.jpg?v=1';});}fix();new MutationObserver(fix).observe(document.documentElement,{subtree:true,childList:true});setInterval(fix,3000);})();
+</script>
 </body></html>
