@@ -3,6 +3,13 @@ const path = require('path');
 
 let liveCache = { at: 0, articles: [] };
 
+function loadAshishPhoto() {
+  try {
+    const b64 = fs.readFileSync(path.join(process.cwd(), 'api', 'ashish-image-1.txt'), 'utf8').trim();
+    return b64 ? `data:image/jpeg;base64,${b64}` : '/uploads/ashish-yadav-photo-9.jpg';
+  } catch { return '/uploads/ashish-yadav-photo-9.jpg'; }
+}
+
 const ASHISH = {
   id: 'ashish-yadav-jhansi-luxury-digital-life',
   title: 'From Jhansi to a Luxury-Led Digital Life: The Story of Ashish Yadav',
@@ -12,12 +19,12 @@ const ASHISH = {
   source: 'STARTS JOURNEY',
   author: 'STARTS JOURNEY Editorial',
   readTime: '8 min read',
-  image: '/uploads/ashish-yadav-photo-9.jpg',
-  subjectImage: '/uploads/ashish-yadav-photo-9.jpg',
+  image: loadAshishPhoto(),
+  subjectImage: loadAshishPhoto(),
   tags: ['Ashish Yadav','Jhansi','Content Creator','Fashion','Lifestyle','Travel','Instagram Creator'],
   gallery: [
-    { image:'/uploads/ashish-yadav-photo-9.jpg', caption:'A refined outdoor portrait that brings Ashish’s personal style, confidence and visual identity into focus.' },
-    { image:'/uploads/ashish-yadav-photo-4.jpg', caption:'A relaxed game of pool — a candid glimpse of the personality and easygoing energy behind the creator.' }
+    { image:loadAshishPhoto(), caption:'A portrait from Ashish Yadav’s personal photo collection, highlighting his fashion-led visual identity.' },
+    { image:loadAshishPhoto(), caption:'A second display of the supplied Ashish Yadav photo, used as the article’s visual cover.' }
   ],
   sections: [
     { heading:'The Beginning Nobody Saw', paragraphs:[
@@ -179,7 +186,7 @@ async function loadLiveNews() {
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store, max-age=0');
   const p = (req.url || '').split('?')[0];
-  if (p === '/api/health') return res.status(200).json({ ok: true, vercel: true, build: 'ashish-full-article-v9' });
+  if (p === '/api/health') return res.status(200).json({ ok: true, vercel: true, build: 'ashish-full-article-v10' });
   if (p === '/api/content') {
     const fallback = loadFallback().map(fixAshishImages);
     const live = await loadLiveNews();
