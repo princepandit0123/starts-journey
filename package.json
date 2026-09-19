@@ -1,7 +1,13 @@
 {
-  "name": "starts-journey",
+  "name": "starts-journey-cms",
   "version": "1.0.0",
   "private": true,
-  "description": "STARTS JOURNEY - static site with Vercel serverless API routes",
-  "engines": { "node": "24.x" }
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "multer": "^2.0.2"
+  }
 }
