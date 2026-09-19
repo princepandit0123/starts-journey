@@ -1,0 +1,28 @@
+name: Sync public assets
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Copy uploaded Ashish assets into Vercel public folder
+        run: |
+          mkdir -p public/uploads
+          if [ -d uploads ]; then cp -f uploads/* public/uploads/ 2>/dev/null || true; fi
+          mkdir -p public/story
+          if [ -d story ]; then cp -f story/* public/story/ 2>/dev/null || true; fi
+      - name: Commit synced assets
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/uploads public/story
+          git diff --cached --quiet && exit 0
+          git commit -m "Fix public assets for Vercel"
+          git push
